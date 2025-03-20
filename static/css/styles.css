@@ -1,0 +1,363 @@
+/* Estilos generales */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    /* Color de fondo suave */
+    color: #333;
+    /* Color de texto principal */
+}
+
+h2,
+h3 {
+    font-size: 1.2em;
+    /* Reduce el tamaño del texto para evitar desbordes */
+    word-wrap: break-word;
+}
+
+/*Estilos de los tres iconos de la lista de arhivos subidos*/
+.icon-group {
+    margin-left: 10px;
+}
+
+.icon-group a {
+    margin-left: 10px;
+    color: #d9534f;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+.icon-group a:hover {
+    color: #c9302c;
+}
+
+/*CODIGO AÑADIDO 150325*/
+.file-entry span {
+    display: inline-block;
+    max-width: 400px;
+    /* Limita el ancho de los nombres de archivo */
+    white-space: nowrap;
+    /* Evita que el texto se divida en varias líneas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Agrega '...' si el texto es demasiado largo */
+}
+
+
+
+.scrollable-list {
+    max-height: 200px;
+    /* Controla el alto máximo de la lista de archivos */
+    overflow-y: auto;
+    /* Agrega desplazamiento si es necesario */
+}
+
+.file-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 5px 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.file-name {
+    flex-grow: 1;
+    padding: 0 10px;
+    ;
+}
+
+.icon-group {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-link {
+    color: #d9534f;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+.icon-link:hover {
+    color: #c9302c;
+}
+
+
+/*Estilos para documents-container*/
+/* Contenedor de los documentos */
+.documents-container {
+    display: flex;
+    justify-content: space-evenly;
+    /* Distribuye los elementos equitativamente */
+    align-items: stretch;
+    /* Asegura que todas las cajas tengan la misma altura */
+    flex-wrap: wrap;
+    /* Permite que se ajusten si el espacio es reducido */
+    gap: 20px;
+    /* Espacio uniforme entre elementos */
+}
+
+/* Estilos para las cajas */
+.document-box {
+    width: 100%;
+    max-width: 600px;
+    /* Asegura que todas las cajas tengan el mismo ancho */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+
+/*.document-box {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1; /* Hace que todos los elementos ocupen el mismo espacio */
+/*
+    min-width: 250px; /* Evita que se vuelvan demasiado pequeños */
+/*max-width: 33%; /* Limita el tamaño para mantener el equilibrio */
+/*text-align: center;
+} */
+
+/*.documents-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.documents-container>*{
+    width: clamp(250px,33%,1000px);
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+*/
+/* Contenedor principal */
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* Asegura que el contenedor ocupe toda la altura de la pantalla */
+}
+
+/* Cabecera */
+.navbar {
+    background-color: #007bff;
+    /* Color de fondo azul */
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    /* Alinea logo y menú */
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.menu {
+    display: flex;
+}
+
+.menu-item {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    /* Bordes redondeados */
+    transition: background-color 0.3s;
+    /* Transición suave */
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    /* Fondo más oscuro al pasar el ratón */
+}
+
+/* Contenido principal */
+main {
+    padding: 20px;
+}
+
+.documents-container {
+    display: flex;
+    justify-content: center;
+    /*space-evenly*/
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    /*32px*/
+}
+
+.documents-container>* {
+    width: clamp(250px, 33%, 1000px);
+}
+
+/* Secciones */
+.page {
+    display: none;
+    /* Oculta todas las secciones */
+    animation: fadeIn 0.5s ease-in-out;
+    /* Animación de aparición */
+}
+
+.page.active {
+    display: block;
+    /* Muestra la sección activa */
+}
+
+/*CODIGO AÑADIDO */
+/* Estilos para el contenedor de los divs */
+.documents-container {
+    display: flex;
+    /* Habilita Flexbox */
+    justify-content: space-around;
+    /* Distribuye los divs uniformemente con espacio alrededor */
+    align-items: flex-start;
+    /* Alinea los divs en la parte superior */
+}
+
+/* Cajas */
+.document-box,
+.document-box2 {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Sombra suave */
+}
+
+/* Títulos */
+.section-title,
+.opGen {
+    color: #007bff;
+    /* Color de título azul */
+    background-color: transparent;
+    /* Fondo transparente */
+    border: none;
+    /* Sin borde */
+    color: #007bff;
+    /* Color azul (como un enlace) */
+    text-decoration: none;
+    /* Sin subrayado */
+    cursor: pointer;
+    /* Mano al pasar el ratón */
+    padding: 5px 10px;
+    /* Ajustar el padding */
+    margin: 5px;
+    /* Ajustar el margen */
+    border-radius: 5px;
+    /* Bordes redondeados (opcional) */
+    transition: background-color 0.3s ease;
+    /* Transición suave */
+
+}
+
+/*CODIGO AÑADIDO*/
+.opGen:hover {
+    background-color: rgba(0, 123, 255, 0.2);
+    /* Fondo azul suave al pasar el ratón */
+}
+
+.form-input {
+    display: none;
+}
+
+/* Botones */
+.btn,
+.upload-btn,
+.generate-btn {
+    background-color: #007bff;
+    /* Color de fondo azul */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Estilos para la lista de archivos */
+.file-list {
+    list-style: none;
+    padding: 0;
+}
+
+.file-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.file-list li {
+    margin-bottom: 5px;
+}
+
+/* Estilos para el área de arrastrar y soltar */
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.drop-zone:hover {
+    background-color: #eee;
+}
+
+/* Estilos para el equipo de trabajo */
+.team-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Permite que los miembros se ajusten */
+    justify-content: center;
+}
+
+.team-member {
+    margin: 10px;
+    text-align: center;
+}
+
+.member-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    /* Imagen circular */
+    object-fit: cover;
+    /* Evita distorsión de la imagen */
+}
+
+.member-name {
+    font-weight: bold;
+}
+
+/* Estilos para la sección de funcionalidad */
+.functionality-container {
+    display: flex;
+    align-items: center;
+    /* Centra verticalmente */
+}
+
+.video-container {
+    margin-right: 20px;
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

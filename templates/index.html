@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+  <title>UtilTech</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <!--RUTA DE ESTILOS DE LA WEB-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!--RUTA DE FUNCIONES DE LA WEB-->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+  <!--NAVEGADOR DEL SITIO WEB-->
+  <nav class="navbar">
+    <a href="/">
+      <h1 class="logo">UtilTech 2</h1>
+    </a>
+    <div class="menu">
+      <a href="#" data-page="page1" class="menu-item" onclick="mostrarDiv1('div1')">Acerca de</a>
+      <a href="#" data-page="page2" class="menu-item" onclick="mostrarDiv1('div2')">Generar documentos</a>
+      <a href="#" data-page="page3" class="menu-item" onclick="mostrarDiv1('div3')">Plantillas</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <!--SECCION DE ACERCA DE Y FUNCIONAMIENTO DEL SISTEMA-->
+    <section id="acerca" class="page">
+      <div class="document-box2">
+        <h2 class="section-title">Acerca de Utiltech</h2>
+        <p class="textoBienvenida">Bienvenido a Utiltech, tu solucion integral para la gestion de documentos</p>
+      </div>
+      <br>
+      <div class="document-box2">
+        <h3 class="section-title">Integrantes</h3>
+        <div class="team-container">
+          <!--SECCION DEL ESTILO DEL INTEGRANTE-->
+          <div class="team-member">
+            <img src="../static/images/luisMoises.jpg" alt="Sergio Ledesma" class="member-image">
+            <p class="member-name">Sergio Ledesma Hernandez</p>
+            <p class="member-role">Desarrollador Front-end</p>
+          </div>
+
+          <div class="team-member">
+            <img src="../static/images/luisMoises.jpg" alt="Hossein Yahyazadeh" class="member-image">
+            <p class="member-name">Hossein Yahyazadeh</p>
+            <p class="member-role">Desarrollador Front-end</p>
+          </div>
+
+          <div class="team-member">
+            <img src="../static/images/luisMoises.jpg" alt="Luis Moises Pizaña" class="member-image">
+            <p class="member-name">Luis Moises Pizaña Medina</p>
+            <p class="member-role">Secretario de la LTSI</p>
+          </div>
+
+          <div class="team-member">
+            <img src="../static/images/wulfranoLuna.jpg" alt="Wulfrano Arturo Luna" class="member-image">
+            <p class="member-name">Wulfrano Arturo Luna Ramírez</p>
+            <p class="member-role">Coordinador de la LTSI</p>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <!--SECCION DEL VIDEO SOBRE EL FUNCIONAMIENTO DEL SISTEMA-->
+      <div class="document-box2">
+        <h3 class="section-title">Funcionamiento</h3>
+        <div class="functionality-container">
+          <div class="video-container">
+            <video controls width="560" height="315">
+              <source src="" type="">
+              Tu navegador no soporta el elemento del video
+            </video>
+          </div>
+          <div class="functionality-description">
+            <h3>¿Còmo funciona UtilTech?</h3>
+            <p>UtilTech es una herramienta diseñada para simplificar la gestión de documentos académicos. Sigue estos
+              pasos:</p>
+            <ol>
+              <li>Selecciona el tipo de documento que necesitas generar</li>
+              <li>Sube los archivos necesarios en formato TXT</li>
+              <li>Verifica los documentos en las secciones superiores e inferiores</li>
+              <li>Genera los documentos finales con un solo clic</li>
+            </ol>
+            <p>El sistema automatiza el proceso de creación de documentos, ahorrando tiempo y reduciendo errores en la
+              gestión documental.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--SECCION DEL SISTEMA ENCARGADA DE LA GENERACION DE DOCUMENTOS-->
+    <section id="documentos">
+      <h2>Generar documentos</h2>
+      <div class="documents-container">
+        <div class="document-box">
+          <h3 class="opGen">1.- Grupos de PT</h3>
+          <h3 class="opGen">2.- Oficios Carga Academica</h3>
+          <h3 class="opGen">3.- Oficios Tutoria</h3>
+        </div>
+
+        <form class="rd-mail-form" data-form-output="form-output-global" method="post" enctype="multipart/form-data"
+          action="/upload">
+          <div class="document-box">
+            <h3>Subir documentos</h3>
+            <p>Sube el archivo ConfirmaciionDeAsesoriasPT en formato CSV</p>
+            <!--SECCION DE DRAG AND DROP DEL ARCHIVO A SUBIRSE PARA DESPUES SER PROCESADO-->
+            <div class="drop-zone" id="drop">
+              Arrastra y suelta tu archivo aqui o haz clic para subirlo
+            </div>
+            <input class="form-input" id="file-input-1" type="file" name="asignacionesTXT" data-constraint="@Required"
+              accept=".csv" multiple>
+            <input type="hidden" name="form_id" value="formulario1">
+            <div class="upload-list">
+              <ul id="upload-list"></ul>
+            </div>
+            <button class="upload-btn" onclick="uploadFile()" type="submit"><span>Subir Archivo</span></button>
+          </div>
+        </form>
+
+        <!--SECCION DE LOS DOCUMENTOS SUBIDOS-->
+        <div class="document-box">
+          <h3>Documentos subidos</h3>
+
+          <!--SECCION DONDE SE CONSERVA LA RUTA A GUARADR Y NOMBRE DEL ARCHIVO-->
+          {% if div9_block %}
+          <div id="div9" style="display: block;">
+            <h2>El archivo subido es: {{ archivo1 }}</h2>
+            <h3>{{ message }}</h3>
+          </div>
+          {% endif %}
+
+          <!--SECCION DE DOCUMENTOS SUBIDOS-->
+          <div class="legal-content">
+            <form class="rd-mail-form" data-form-output="form-output-global" method="post" enctype="multipart/form-data"
+              action="/GruposPTMulti">
+              <div class="legal-top">
+                <div class="scrollable-list">
+                  <!--CONTENEDOR PARA SUBIR EL ARCHIVO-->
+                  {% set path = 'GruposDePTExcell/ArchivosSubidos/' %}
+                  <!--Se coloca la ruta donde se almacenan los archivos subidos-->
+                  {% if list_Archivos | length > 0 %} <!--Se comprueba que existan archivos dentro de la carpeta-->
+                  {% for foto in list_Archivos%}
+                  <!--Se genera la implementacion para el listado de los archivos contenidos en la carpeta-->
+                  <div class="media">
+                    <div class="media-body">
+                      <!--<h5 class="mt-0"> CODIGO MODIFICA 150325-->
+                      <h5 class="mt-0 file-entry">
+                        <p>
+                          <input type="checkbox" name="{{ foto }}" class="file-checkbox" value="{{ foto }}">
+
+                          <span class="file-name">{{ loop.index }} - {{ foto }}</span>
+                        </p>
+                        <p>
+                        <div class="file-actions">
+                          <a href="{{ url_for('generar_GruposPT', filename=foto) }}" type="button"
+                            class="btn btn-danger" style="margin-top: 40px;">
+                            <i class="fas fa-file"></i>
+                          </a>
+
+                          <a href="{{ url_for('delete_file_subidos', filename=foto) }}" type="button"
+                            class="btn btn-danger" style="margin-top: 40px;">
+                            <i class="fas fa-trash-alt"></i>
+                          </a>
+
+                          <a href="{{ url_for('view_file_generated', filename=foto) }}" type="button"
+                            class="btn btn-danger" style="margin-top: 40px;">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                        </div>
+                        </p>
+                      </h5>
+                    </div>
+                  </div>
+
+                  {% endfor %}
+                  {% else %}
+                  <p> No se han subido archivos.</p>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!--SECCION DE DOCUMENTOS GENERADOS-->
+              <div class="generate-section">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="generateCheckbox">
+                  <span class="checkmark"></span>
+                </label>
+                <button class="generate-btn" id="GenerarDocu" type="submit">Generar los documentos</button>
+              </div>
+            </form>
+
+            <!--SECCION DE LOS DOCUMENTOS GENERADOS-->
+            <h3>Documentos Generados</h3>
+            {% if div9_block %}
+            <div id="div9" style="display: block;">
+              <h2>Los archivos generados son: {{ archivos }}</h2>
+              <h3>{{ message2 }}</h3>
+            </div>
+            {% endif %}
+
+            <div class="legal-bottom">
+              <div class="scrollable-list">
+                {% set path = 'GruposDePTExcell/ArchivosGenerados/' %}
+                {% if list_Archivos2 | length > 0 %}
+                {% for foto in txt_file in text_files %}
+                <div class="media">
+                  <div class="media-body">
+                    <h5 class="mt-0">
+                      <p>
+                        <span>{{ loop.index }}.- {{ foto }}</span>
+                      </p>
+                      <p>
+                        <a href="{{ url_for('generar_GruposPT', filename=foto) }}" type="button" class="btn btn-danger"
+                          style="margin-top: 40px;">
+                          <i class="fas fa-file"></i>
+                        </a>
+                        <a href="{{ url_for('delete_file_generados', filename=foto) }}" type="button"
+                          class="btn btn-danger" style="margin-top: 40px;">
+                          <i class="fas fa-trash-alt"></i>
+                        </a>
+                        <a href="{{ url_for('view_file', filename=foto) }}" type="button" class="btn btn-danger"
+                          style="margin-top: 40px;">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                      </p>
+                    </h5>
+                  </div>
+                </div>
+                {% endfor %}
+
+                {% for foto in excel_file in excel_files %}
+                <div class="media">
+                  <div class="media-body">
+                    <h5 class="mt-0">
+                      <p>
+                        <input type="checkbox" class="file-checkbox" value="{{ foto }}">
+
+                        <span>{{ loop.index }}.-{{ foto }}</span>
+                      </p>
+                      <a href="{{ url_for('generar_GruposPT', filename=foto) }}" type="button" class="btn btn-danger"
+                        style="margin-top: 40px;">
+                        <i class="fas fa-file"></i>
+                      </a>
+
+
+                      <a href="{{ url_for('delete_file', filename=foto) }}" type="button" class="btn btn-danger"
+                        style="margin-top: 40px;">
+                        <i class="fas fa-trash-alt"></i>
+                      </a>
+
+                      <!--Seccion visualizar los archivos subidos-->
+                      <a href="{{ url_for('view_file', filename=foto) }}" type="button" class="btn btn-danger"
+                        style="margin-top: 40px;">
+                        <i class="fas fa-eye"></i>
+                      </a>
+
+                      <!--Seccion checkbox para la generacion de todos los documentos subidos-->
+                      <a>
+                        <label class="checkbox-container">
+                          <input type="checkbox" id="generateCheckbox">
+                          <span class="checkmark"></span>
+                        </label>
+                      </a>
+
+                    </h5>
+                  </div>
+                </div>
+                {% endfor %}
+
+                {% else %}
+                <p>No se han generado archivos</p>
+                {% endif %}
+              </div>
+            </div>
+            <div class="generate-section">
+              <label class="checkbox-container">
+                <input type="checkbox" id="generateCheckbox">
+                <span class="checkmark"></span>
+              </label>
+              <button class="generate-btn">Descargar los documentos</button>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!--SECCION DE LA ELECCION DE LA PLANTILLA A USAR PREVIO A LA GENERACION DE LOS DOCUMENTOS-->
+    <section id="plantillas_section" class="page hidden">
+      <h2>Plantillas</h2>
+      <p>Explora nuestra colección de plantillas predefinidas.</p>
+    </section>
+
+  </main>
+</body>
+
+</html>

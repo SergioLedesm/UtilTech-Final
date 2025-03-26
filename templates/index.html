@@ -22,9 +22,9 @@
       <h1 class="logo">UtilTech 2</h1>
     </a>
     <div class="menu">
-      <a href="#" data-page="page1" class="menu-item" onclick="mostrarDiv1('div1')">Acerca de</a>
-      <a href="#" data-page="page2" class="menu-item" onclick="mostrarDiv1('div2')">Generar documentos</a>
-      <a href="#" data-page="page3" class="menu-item" onclick="mostrarDiv1('div3')">Plantillas</a>
+      <a href="#" data-page="page1" class="menu-item" onclick="goToSection('acerca')">Acerca de</a>
+      <a href="#" data-page="page2" class="menu-item" onclick="goToSection('documentos')">Generar documentos</a>
+      <a href="#" data-page="page3" class="menu-item" onclick="goToSection('plantillas_section')">Plantillas</a>
     </div>
   </nav>
 
@@ -99,7 +99,7 @@
     <!--#######################################################################################################################-->
     <!--#######################################################################################################################-->
     <!--SECCION DEL SISTEMA ENCARGADA DE BRINDAR UN MENU DE LAS GENERACIONES QUE SE PUEDEN HACER-->
-    <section id="documentos">
+    <section id="documentos" class="page active">
       <h2>Generar documentos</h2>
       <div class="documents-container">
         <div class="document-box">
@@ -298,7 +298,7 @@
     </section>
 
     <!--SECCION DE LA ELECCION DE LA PLANTILLA A USAR PREVIO A LA GENERACION DE LOS DOCUMENTOS-->
-    <section id="plantillas_section" class="page hidden">
+    <section id="plantillas_section" class="page">
       <h2>Plantillas</h2>
       <p>Explora nuestra colección de plantillas predefinidas.</p>
     </section>

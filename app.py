@@ -1,28 +1,17 @@
-from fileinput import filename
-from pickle import GET
-from random import sample
-from flask import Flask, jsonify, request, render_template, send_file, send_from_directory, session
-from importlib.util import spec_from_file_location
-from openpyxl.styles import Font, Border, Side, PatternFill, Alignment, Protection
+from flask import Flask, jsonify, request, render_template
+from openpyxl.styles import Font, Border, Side, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
-from copy import copy
 from datetime import datetime
-from pkg_resources import run_script
 from werkzeug.utils import secure_filename
 from datetime import date
 from openpyxl import load_workbook
+from configConstants import directorio_oficiosCargaAcademica, path_resultado, directorio_archivos_generados, directorio_archivos_subidos, archivosGenerados1_folder, directorio_archiGeneradosGruposDePtExcell, plantilla1, form_data, directorio_automatico
 
-import threading
 import openpyxl 
-import sys
 import os
 import pandas as pd
-import pathlib
-import subprocess
-import importlib.util
 import openpyxl
 import secrets
-import requests
 
 
 app = Flask(__name__)
@@ -39,7 +28,7 @@ app.secret_key = secrets.token_hex(16) #Se sobrescribe la clave anterior con un 
 #######################################################################################
 #######################################################################################
 #Seccion generadora del trimestre lectivo
-TRIMESTRE_FILE = "../UtilTech-050325/GruposDePTExcell/Plantilla/trimestre_actual.txt"
+TRIMESTRE_FILE = "./GruposDePTExcell/Plantilla/trimestre_actual.txt"
 
 def obtener_trimestre():
     hoy = date.today()
@@ -63,9 +52,7 @@ def obtener_trimestre_fijo():
     if os.path.exists(TRIMESTRE_FILE):
         with open(TRIMESTRE_FILE, "r") as f:
             return f.read().strip()
-
     # Si no existe, generamos el trimestre y lo guardamos
-    trimestre = obtener_trimestre()
     with open(TRIMESTRE_FILE, "w") as f:
         f.write(trimestre)
     return trimestre
@@ -74,110 +61,18 @@ def obtener_trimestre_fijo():
 #######################################################################################
 #######################################################################################
 #DEFINICION DE LAS VARIABLES GLOBALES
-form_data = None
-archivoGlo1 = None
-archivoGlobal1 = None
-list_Archivos = None
 archivo_txt = None
 workbook = None
-ArchiGenerado = None
 grupos = []
 trimestre = obtener_trimestre_fijo() #'24-O' #Trimestre lectivo / cambio cada trimestre de acuerdo a la fecha actual
-excell_resultado = 'PlantillaAsignacionCoeficientesPT'+'-'+trimestre+'.xlsx' #Excel generado de Grupos de PT
 profesores = []
 
-
-#######################################################################################
-#######################################################################################
-#######################################################################################
-#DIRECTORIO DE LA RUTAS
-#RUTA DONDE SE ENCUENTRA EL PROYECTO
-directorio_automatico = os.path.dirname(os.path.abspath(__file__))
-
-#RUTA DONDE SE ENCUENTRAN LOS ARCHIVOS DEL PROGRAMA 1 (GRUPOS DE PT)
-directorio_archivos_subidos = f'{directorio_automatico}\\GruposDePTExcell\\ArchivosSubidos'
-directorio_archivos_generados = f'{directorio_automatico}\\GruposDePTExcell\\ArchivosGenerados'
-directorio_archiGeneradosGruposDePtExcell = f'{directorio_automatico}\\GruposDePTExcell\\ArchivosGenerados' #Añadido
-
-#RUTA DE LA FUNCION GRUPOS DE PT
-directorio_gruposDePtExcell = directorio_automatico + "\\GruposDePTExcell"
-#RUTA DE LA FUNCION OFICIOS CARGA ACADEMICA
-directorio_oficiosCargaAcademica = directorio_automatico + "\\OficiosCargaAcademica"
-#RUTA DE LA FUNCION OFICIOS TUTORIA PT ASESORIA
-directorio_oficiosDocAsesoria = directorio_automatico + "\\OficiosTutoriaPT\\docAsesoria"
-#RUTA DE LA FUNCION OFICIOS TUTORIA PT PROYECTO TERMINAL
-directorio_oficiosDocGenTem = directorio_automatico + "\\OficiosTutoriaPT\\documentGen"
-
-
-#RUTA DE LAS PLANTILLAS A LLENAR POR LOS MODULOS
-plantilla1 = directorio_gruposDePtExcell + "\\Plantilla\\PlantillaAsignacionCoeficientesPT-24-O.xlsx"
-
-plantilla2 = directorio_oficiosCargaAcademica + "\\Plantilla\\PlantillasAsignacionCoeficientesPT-24-0.xlsx" 
-
-plantilla3 = directorio_oficiosDocAsesoria + "\\Plantilla\\PlantillasAsignacionCoeficientesPT-24-0.xlsx"
-
-plantilla4 = directorio_oficiosDocGenTem + "\\Plantilla\\PlantillasAsignacionCoeficientesPT-24-0.xlsx"
-
-path = directorio_oficiosCargaAcademica + "\\Plantilla\\propuesta.xlsx"
-
-
-#RUTA HASTA LOS ARCHIVOS SUBIDOS POR LOS USUARIOS
-archivosSubidos1_folder = os.path.join(os.path.dirname(__file__), 'GruposDePTExcell\\ArchivosSubidos\\')
-
-archivosSubidos2_folder = os.path.join(os.path.dirname(__file__), 'OficiosCargaAcademica\\ArchivosSubidos\\')
-
-archivosSubidos3_folder = os.path.join(os.path.dirname(__file__), 'OficiosTutoriaPT\\docAsesoria\\ArchivosSubidos\\')
-
-archivosSubidos4_folder = os.path.join(os.path.dirname(__file__), 'OficiosTutoriaPT\\documentGen\\ArchivosSubidos\\')
-
-#RUTA HASTA LOS ARCHIVOS GENERADOS POR LOS USUARIOS
-archivosGenerados1_folder = os.path.join(os.path.dirname(__file__), 'GruposDePTExcell\\ArchivosGenerados\\')
-
-archivosGenerados2_folder = os.path.join(os.path.dirname(__file__), 'OficiosCargaAcademica\\ArchivosGenerados\\')
-
-archivosGenerados3_folder = os.path.join(os.path.dirname(__file__), 'OficiosTutoriaPT\\docAsesoria\\ArchivosGenerados\\')
-
-archivosGenerados4_folder = os.path.join(os.path.dirname(__file__), 'OficiosTutoriaPT\\documentGen\\ArchivosGenerados\\')
-
-#VARIABLE DEL TIPO DE CARPETA SUBIDOS/GENERADOS
-tipo = None
-form_id = None
-list_Archivos = None
-
-
-#Ruta direccionada a la seleccion del Programa a usar (1, 2, 3) y si se trata de un archivo SUBIDO o GENERADO
-form_data = {
-    'formulario1': {
-        'file_key': 'asignacionesTXT',
-        'subidos': archivosSubidos1_folder,
-        'generados': archivosGenerados1_folder,
-    },
-    'formulario2': {
-        'file_key': 'PAEG_TySI',
-        'subidos': archivosSubidos2_folder,
-        'generados': archivosGenerados2_folder,
-    },
-    'formulario3': {
-        'file_key': 'asignaciones1TXT',
-        'subidos': archivosSubidos3_folder,
-        'generados': archivosGenerados3_folder,
-    },
-    'formulario4': {
-        'file_key': 'asignaciones2TXT',
-        'subidos': archivosSubidos4_folder,
-        'generados': archivosGenerados4_folder,
-    },
-   }
-
-
-#RUTA DE LA DIRECCION DEL ARCHIVO RESULTADO DEL PROGRAMA 2
-path_resultado = directorio_automatico + '\Resultado.xlsx'
+path = directorio_oficiosCargaAcademica + "\\Plantilla\\propuesta.xlsx" # Esta si es variable
 
 # Asegurarse de que las carpetas existen
 for form in form_data.values():
     os.makedirs(form['subidos'], exist_ok=True)
     os.makedirs(form['generados'], exist_ok=True)
-
 
 #######################################################################################
 #######################################################################################
@@ -200,8 +95,6 @@ def index():
 def upload_file():
     #Implementacion de las variables globales
     global form_data
-    global archivoGlo1
-    global list_Archivos
 
     form_id = request.form.get('form_id')
     #Impresion de la seleccion del usuario en el form a ejecutarse de archivos a subirse
@@ -220,13 +113,11 @@ def upload_file():
         new_filename = f"{name}_{timestamp}{ext}" #SE PROCEDE A RENOMBRAR EL ARCHIVO SUBIDO POR EL USUARIO
         upload_path = os.path.join(directorio_automatico, folder, new_filename) 
         file.save(upload_path)
-        archivoGlo1 = upload_path #SE ASIGNA LA RUTA DEL ARCHIVO GUARDADO A TRAVES DE LA VARIABLE GLOBAL
 
         #Impresion de los archivos subidos
         print(f"Archivo subido correctamente: {file}")
         print(f"El archivo se guardó en {upload_path}")
         print(f"Archivo con time: {new_filename}")
-        print(f"Archivo con time y ruta de directorio: {archivoGlo1}") 
 
         return render_template('index.html',
                                 #FOLDERS DONDE SE ALMACENARON LOS ARCHIVOS SUBIDOS
@@ -273,12 +164,11 @@ def delete_file_subidos(filename):
 
     # Aquí debes definir los valores para form_id y tipo
     form_id = 'formulario1'  # Cambia esto según tu lógica
-    tipo = 'subidos'  # Cambia esto según tu lógica
     if os.path.isfile(file_path):
         try:
             os.remove(file_path)
             return render_template('index.html',
-                               list_Archivos = listaArchivos(form_id, tipo),
+                               list_Archivos = listaArchivos(form_id, "subidos"),
                                show_subir = True)
         except Exception as e:
             return jsonify({'error': f'No se pudo eliminar el archivo: {str(e)}'}), 500
@@ -295,12 +185,11 @@ def delete_file_generados(filename):
 
     # Aquí debes definir los valores para form_id y tipo
     form_id = 'formulario1'  # Cambia esto según tu lógica
-    tipo = 'generados'  # Cambia esto según tu lógica
     if os.path.isfile(file_path):
         try:
             os.remove(file_path)
             return render_template('index.html',
-                               list_Archivos = listaArchivos(form_id, tipo),
+                               list_Archivos = listaArchivos(form_id, "generados"),
                                show_subir = True)
         except Exception as e:
             return jsonify({'error': f'No se pudo eliminar el archivo: {str(e)}'}), 500
@@ -318,13 +207,13 @@ def delete_file_generados(filename):
 
 
 #FUNCION QUE TRANSFORMA EL ARCHIVO CSV SUBIDO A ARCHIVO TXT CON LA ESTRUCTURA
-def procesar_archivo_csv(archivoGlo1):
+def procesar_archivo_csv(archivo_para_procesar):
     global archivo_txt
     # Definir el nombre del archivo TXT que se generará
-    archivo_txt = f"{archivoGlo1.split('.')[0]}.txt".replace('ArchivosSubidos', 'ArchivosGenerados')
+    archivo_txt = f"{archivo_para_procesar.split('.')[0]}.txt".replace('ArchivosSubidos', 'ArchivosGenerados')
     try:
         # Ejecutar la función para la generación del archivo
-        convierte_csv_a_txt(archivoGlo1)
+        convierte_csv_a_txt(archivo_para_procesar)
         # Retorna la ruta completa del archivo generado TXT
     except Exception as e:
         print(f"Error al procesar el archivo CSV: {e}")
@@ -333,12 +222,12 @@ def procesar_archivo_csv(archivoGlo1):
 #######################################################################################
 #######################################################################################
 #FUNCION ENCARGADA DE CONVERTIR EL ARCHIVO CSV PARA EL CORRECTO FUNCIONAMIENTO DEL PROGRAMA 1
-def convierte_csv_a_txt(archivoGlo1):
+def convierte_csv_a_txt(archivo_csv):
     global archivo_txt
     try:
         # Lee el archivo CSV
-        print(f"Leyendo el archivo CSV: {archivoGlo1}")
-        df = pd.read_csv(archivoGlo1)
+        print(f"Leyendo el archivo CSV: {archivo_csv}")
+        df = pd.read_csv(archivo_csv)
         print("Archivo CSV leído correctamente")
     except Exception as e:
         raise ValueError(f"Error al leer el archivo CSV: {e}")
@@ -431,11 +320,9 @@ def get_numero_economico(nombre_del_profe, codigoGen1):
 #######################################################################################
 #######################################################################################
 def configProfesores():
-    global workbook
-    workbook = openpyxl.load_workbook(plantilla1)
     #--------------------------------------------------------------
     #HOJA DE LOS PROFESORES
-    hoja_profesores = workbook['Profesores']
+    hoja_profesores = openpyxl.load_workbook(plantilla1)['Profesores']
     #Recorrer la hoja de profesores
     for cell in hoja_profesores.iter_rows(min_row=3, max_row=hoja_profesores.max_row, min_col=1, max_col=2, values_only=True):
         if cell[0] is not None and cell[1] is not None:
@@ -1229,8 +1116,7 @@ def main(codigoGen1):
     #4.- Guardar los cambios en el libro de trabajo
     try:
         timestamp =datetime.now().strftime('%Y%m%d_%H%M%S')
-        excell_resultado_without_extension = excell_resultado.split('.')[0]
-        workbook_file_to_save = f"{directorio_archiGeneradosGruposDePtExcell}\\{excell_resultado_without_extension}_{timestamp}.xlsx"
+        workbook_file_to_save = f"{directorio_archiGeneradosGruposDePtExcell}\\PlantillaAsignacionCoeficientesPT-{trimestre}_{timestamp}.xlsx"
         print(f"Guardando el archivo en: {workbook_file_to_save}")
         workbook.save(workbook_file_to_save)
         generar_txt_estudiantes_PT()
@@ -1270,7 +1156,7 @@ def generar_GruposPT(filename):
                                             archivosGenerados1_folder2=archivosGenerados1_folder,
                                             #list_Archivos2=listar_archivos(form_id, tipo),
                                             message=f"El archivo se guardó en {fileGenerated.txt_filename}",
-                                            archivosGlobales=[fileGenerated.archivoGlobal1],
+                                            archivosGlobales=[fileGenerated.filename],
                                             codigosGen=[fileGenerated.codigoGen1],
                                             #generated_files=generated_files,
                                             list_Archivos=listar_archivos_subidos(),
@@ -1324,13 +1210,13 @@ def generar_GruposPTMulti():
     if successedFiles and len(successedFiles) > 0:
         message = f"Los archivos se guardaron en {', '.join([file.get('txt_filename') for file in successedFiles if file.get('txt_filename')])}"
     if failedFiles and len(failedFiles) > 0:
-        message = message + f"Hubo una falla al procesar los siguientes archivos: {', '.join([file.get('archivoGlobal1') for file in failedFiles if file.get('archivoGlobal1')])}"
+        message = message + f"Hubo una falla al procesar los siguientes archivos: {', '.join([file.get('filename') for file in failedFiles if file.get('filename')])}"
     message2 = ''
     if successedFiles and len(successedFiles) > 0:
         message2 = f"Los archivos {', '.join([file.get('txt_filename') for file in successedFiles if file.get('txt_filename')])} se generaron con éxito en {directorio_archiGeneradosGruposDePtExcell}"
     if failedFiles and len(failedFiles) > 0:
-        message2 = message2 + f"Los archivos {', '.join([file.get('archivoGlobal1') for file in failedFiles if file.get('archivoGlobal1')])}, tuvieron el siguiente error: Archivo CSV no encontrado"
-    archivosGlobales = [fileGenerated.get("archivoGlobal1") for fileGenerated in successedFiles]
+        message2 = message2 + f"Los archivos {', '.join([file.get('filename') for file in failedFiles if file.get('filename')])}, tuvieron el siguiente error: Archivo CSV no encontrado"
+    archivosGlobales = [fileGenerated.get("filename") for fileGenerated in successedFiles]
     codigosGen = [fileGenerated.get("codigoGen1") for fileGenerated in successedFiles]
     archivos = [fileGenerated.get("archivo") for fileGenerated in successedFiles]
     txt_filenames = [fileGenerated.get("txt_filename") for fileGenerated in successedFiles]
@@ -1366,26 +1252,22 @@ def generar_GruposPTMulti():
 #######################################################################################
 def doGenerarGruposPT(filename, form_id):
     global directorio_automatico
-    global archivoGlo1
-    global archivoGlobal1
-    global ArchiGenerado
 
-    archivoGlobal1 = filename
     folderSubidos = form_data[form_id]['subidos']
     folderGenerados = form_data[form_id]['generados']
 
-    archivoGlo1 = folderSubidos + archivoGlobal1
-    print(f"ArchivoGlobal1 que se usará en el main: {archivoGlobal1}")
-    print(f"ArchivoGlo1 que se usará en el main: {archivoGlo1}")  # RUTA COMPLETA DEL CSV SUBIDO POR EL USUARIO
+    archivo_con_ruta = folderSubidos + filename
+    print(f"filename que se usará en el main: {filename}")
+    print(f"archivo_con_ruta que se usará en el main: {archivo_con_ruta}")  # RUTA COMPLETA DEL CSV SUBIDO POR EL USUARIO
 
     try:
-        # Revisar que archivoGlo1 incluya .csv
-        hasDotCSV = archivoGlo1.endswith('.csv')
+        # Revisar que archivo_con_ruta incluya .csv
+        hasDotCSV = archivo_con_ruta.endswith('.csv')
         if not hasDotCSV:
             raise ValueError("El archivo no tiene la extensión .csv")
 
-        if os.path.exists(archivoGlo1):  # csv_path
-            txt_filename = procesar_archivo_csv(archivoGlo1)  # csv_path
+        if os.path.exists(archivo_con_ruta):  # csv_path
+            txt_filename = procesar_archivo_csv(archivo_con_ruta)  # csv_path
 
             # Asegúrate de que el archivo TXT existe antes de procesarlo
             if not os.path.exists(txt_filename):
@@ -1408,18 +1290,18 @@ def doGenerarGruposPT(filename, form_id):
             # Renderizar la plantilla con los datos necesarios
             return {
                 "txt_filename": txt_filename,
-                "archivoGlobal1": archivoGlobal1,
+                "filename": filename,
                 "codigoGen1": codigoGen1,
                 "archivo": coeficientes,
                 "success": True
             }
         else:
-            raise FileNotFoundError(f"El archivo CSV no se encontró: {archivoGlo1}")
+            raise FileNotFoundError(f"El archivo CSV no se encontró: {archivo_con_ruta}")
 
     except Exception as e:
         print(f"Error al generar los grupos PT: {e}")
         return {
-            "archivoGlobal1": archivoGlobal1,
+            "filename": filename,
             "success": False
         }
 
@@ -1592,12 +1474,6 @@ def crear_coeficiente(row_number, column_number, hoja, data):
 #Este diccionario se llena de datos
 diccionario_de_posiciones_de_tablas = []
 
-# guardando el documento
-documento = pd.ExcelFile(path, engine='openpyxl')
-
-#sheet = 'TRIMESTRE X'
-sheet = 'FORMATO PROGRAMACIÓN'
-
 ### diccionario de datos de las tablas
 diccionario_tablas = {
     'NOMBRE': [],
@@ -1607,7 +1483,7 @@ diccionario_tablas = {
 }
 
 #Guardando el documento
-documento = pd.read_excel(path, sheet_name=sheet, engine='openpyxl')
+documento = pd.read_excel(path, sheet_name='FORMATO PROGRAMACIÓN', engine='openpyxl')
 #######################################################################################
 #######################################################################################
 #Funcion para recorrer los valores

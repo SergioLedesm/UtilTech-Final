@@ -8,7 +8,7 @@ let siteConfigs = {
 /** 
 document.addEventListener('DOMContentLoaded', function () {
     // Función para mostrar un div específico y ocultar los demás
-    window.mostrarDiv1 = function (divId) {
+    window.goToSection = function (divId) {
         // Oculta todos los divs con la clase 'div-oculto'
         //// const divs = document.querySelectorAll('.div-oculto');
         //// divs.forEach(div => {
@@ -44,11 +44,11 @@ document.addEventListener('DOMContentLoaded', function () {
             event.preventDefault();
             const page = this.getAttribute('data-page');
             if (page === 'page1') {
-                mostrarDiv1('acerca');
+                goToSection('acerca');
             } else if (page === 'page2') {
-                mostrarDiv1('documentos');
+                goToSection('documentos');
             } else if (page === 'page3') {
-                mostrarDiv1('plantillas_section');
+                goToSection('plantillas_section');
             }
         });
     });
@@ -88,16 +88,16 @@ function addHandlerToSelectAllBTN() {
 
 
 //FUNCION PARA APERECER DESAPARECER LOS ELEMENTOS PRINCIPALES DE LA VENTANA DE VISUALIZACION AL USUARIO
-function mostrarDiv1(divId) {
+function goToSection(divId) {
     // Oculta todos los divs con la clase 'page'
     document.querySelectorAll('.page').forEach(div => {
-        div.classList.add('hidden');
+        div.classList.remove('active');
     });
 
     // Muestra el div seleccionado
     const targetDiv = document.getElementById(divId);
     if (targetDiv) {
-        targetDiv.classList.remove('hidden');
+        targetDiv.classList.add('active');
     }
 }
 

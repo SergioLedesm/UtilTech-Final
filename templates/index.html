@@ -96,7 +96,9 @@
       </div>
     </section>
 
-    <!--SECCION DEL SISTEMA ENCARGADA DE LA GENERACION DE DOCUMENTOS-->
+    <!--#######################################################################################################################-->
+    <!--#######################################################################################################################-->
+    <!--SECCION DEL SISTEMA ENCARGADA DE BRINDAR UN MENU DE LAS GENERACIONES QUE SE PUEDEN HACER-->
     <section id="documentos">
       <h2>Generar documentos</h2>
       <div class="documents-container">
@@ -106,25 +108,30 @@
           <h3 class="opGen">3.- Oficios Tutoria</h3>
         </div>
 
+        <!--#######################################################################################################################-->
+        <!--#######################################################################################################################-->
+        <!--SECCION DEL SISTEMA ENCARGADA DE LA SUBIDA DEL ARCHIVO A ALMACENAR-->
         <form class="rd-mail-form" data-form-output="form-output-global" method="post" enctype="multipart/form-data"
           action="/upload">
           <div class="document-box">
             <h3>Subir documentos</h3>
-            <p>Sube el archivo ConfirmaciionDeAsesoriasPT en formato CSV</p>
+            <p id="file-input-message-1">Sube el archivo ConfirmacionDeAsesoriasPT en formato CSV</p>
             <!--SECCION DE DRAG AND DROP DEL ARCHIVO A SUBIRSE PARA DESPUES SER PROCESADO-->
             <div class="drop-zone" id="drop">
               Arrastra y suelta tu archivo aqui o haz clic para subirlo
             </div>
             <input class="form-input" id="file-input-1" type="file" name="asignacionesTXT" data-constraint="@Required"
-              accept=".csv" multiple>
-            <input type="hidden" name="form_id" value="formulario1">
+              accept=".csv" multiple required>
+            <input id="file-input-option-1" type="hidden" name="form_id" value="formulario1">
             <div class="upload-list">
               <ul id="upload-list"></ul>
             </div>
-            <button class="upload-btn" onclick="uploadFile()" type="submit"><span>Subir Archivo</span></button>
+            <button class="upload-btn" type="submit"><span>Subir Archivo</span></button>
           </div>
         </form>
 
+        <!-- #######################################################################################-->
+<!-- #######################################################################################-->
         <!--SECCION DE LOS DOCUMENTOS SUBIDOS-->
         <div class="document-box">
           <h3>Documentos subidos</h3>
@@ -143,8 +150,6 @@
               action="/GruposPTMulti">
               <div class="legal-top">
                 <div class="scrollable-list">
-                  <!--CONTENEDOR PARA SUBIR EL ARCHIVO-->
-                  {% set path = 'GruposDePTExcell/ArchivosSubidos/' %}
                   <!--Se coloca la ruta donde se almacenan los archivos subidos-->
                   {% if list_Archivos | length > 0 %} <!--Se comprueba que existan archivos dentro de la carpeta-->
                   {% for foto in list_Archivos%}
@@ -155,6 +160,7 @@
                       <h5 class="mt-0 file-entry">
                         <p>
                           <input type="checkbox" name="{{ foto }}" class="file-checkbox" value="{{ foto }}">
+                          <input id="file-checkbox-option-2" type="hidden" name="form_id" value="formulario1">
 
                           <span class="file-name">{{ loop.index }} - {{ foto }}</span>
                         </p>

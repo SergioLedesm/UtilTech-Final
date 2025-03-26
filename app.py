@@ -6,9 +6,11 @@ from importlib.util import spec_from_file_location
 from openpyxl.styles import Font, Border, Side, PatternFill, Alignment, Protection
 from openpyxl.utils import get_column_letter
 from copy import copy
-from  datetime import datetime
+from datetime import datetime
 from pkg_resources import run_script
-from  werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename
+from datetime import date
+from openpyxl import load_workbook
 
 import threading
 import openpyxl 
@@ -25,9 +27,52 @@ import requests
 
 app = Flask(__name__)
 
-app.secret_key = 'UtilTech' #LLAVE SECRETA PARA EL PASE DE DATOS
-app.secret_key = secrets.token_hex(16)
 
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#Claves
+app.secret_key = 'UtilTech' #Se establece la clave secreta manualmente con la cadena
+app.secret_key = secrets.token_hex(16) #Se sobrescribe la clave anterior con un valor aleatorio generado
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#Seccion generadora del trimestre lectivo
+TRIMESTRE_FILE = "../UtilTech-050325/GruposDePTExcell/Plantilla/trimestre_actual.txt"
+
+def obtener_trimestre():
+    hoy = date.today()
+    anio = hoy.year % 100  # Obtener los últimos dos dígitos del año
+    
+    trimestres = [
+        (date(hoy.year, 10, 21), date(hoy.year + 1, 1, 24), 'O'),
+        (date(hoy.year, 2, 10), date(hoy.year, 5, 9), 'I'),
+        (date(hoy.year, 5, 26), date(hoy.year, 8, 15), 'P')
+    ]
+    
+    for inicio, fin, letra in trimestres:
+        if inicio <= hoy <= fin:
+            return f"{anio}-{letra}"
+    
+    # Si no está en ninguno de los rangos, significa que estamos fuera del periodo lectivo
+    return f"{anio}-P" if hoy > trimestres[2][1] else f"{anio - 1}-O"
+#Seccion donde se mantiene el trimestre fijo en la generacion de los otros documentos
+def obtener_trimestre_fijo():
+    # Si el archivo ya existe, usamos el trimestre almacenado
+    if os.path.exists(TRIMESTRE_FILE):
+        with open(TRIMESTRE_FILE, "r") as f:
+            return f.read().strip()
+
+    # Si no existe, generamos el trimestre y lo guardamos
+    trimestre = obtener_trimestre()
+    with open(TRIMESTRE_FILE, "w") as f:
+        f.write(trimestre)
+    return trimestre
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #DEFINICION DE LAS VARIABLES GLOBALES
 form_data = None
 archivoGlo1 = None
@@ -37,15 +82,19 @@ archivo_txt = None
 workbook = None
 ArchiGenerado = None
 grupos = []
-trimestre = '24-O'
-excell_resultado = 'PlantillaAsignacionCoeficientesPT'+'-'+trimestre+'.xlsx'
+trimestre = obtener_trimestre_fijo() #'24-O' #Trimestre lectivo / cambio cada trimestre de acuerdo a la fecha actual
+excell_resultado = 'PlantillaAsignacionCoeficientesPT'+'-'+trimestre+'.xlsx' #Excel generado de Grupos de PT
 profesores = []
 
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #DIRECTORIO DE LA RUTAS
 #RUTA DONDE SE ENCUENTRA EL PROYECTO
 directorio_automatico = os.path.dirname(os.path.abspath(__file__))
 
-#RUTA DONDE SE ENCUENTRAN LOS ARCHIVOS
+#RUTA DONDE SE ENCUENTRAN LOS ARCHIVOS DEL PROGRAMA 1 (GRUPOS DE PT)
 directorio_archivos_subidos = f'{directorio_automatico}\\GruposDePTExcell\\ArchivosSubidos'
 directorio_archivos_generados = f'{directorio_automatico}\\GruposDePTExcell\\ArchivosGenerados'
 directorio_archiGeneradosGruposDePtExcell = f'{directorio_automatico}\\GruposDePTExcell\\ArchivosGenerados' #Añadido
@@ -68,6 +117,8 @@ plantilla2 = directorio_oficiosCargaAcademica + "\\Plantilla\\PlantillasAsignaci
 plantilla3 = directorio_oficiosDocAsesoria + "\\Plantilla\\PlantillasAsignacionCoeficientesPT-24-0.xlsx"
 
 plantilla4 = directorio_oficiosDocGenTem + "\\Plantilla\\PlantillasAsignacionCoeficientesPT-24-0.xlsx"
+
+path = directorio_oficiosCargaAcademica + "\\Plantilla\\propuesta.xlsx"
 
 
 #RUTA HASTA LOS ARCHIVOS SUBIDOS POR LOS USUARIOS
@@ -94,6 +145,7 @@ form_id = None
 list_Archivos = None
 
 
+#Ruta direccionada a la seleccion del Programa a usar (1, 2, 3) y si se trata de un archivo SUBIDO o GENERADO
 form_data = {
     'formulario1': {
         'file_key': 'asignacionesTXT',
@@ -117,22 +169,32 @@ form_data = {
     },
    }
 
+
+#RUTA DE LA DIRECCION DEL ARCHIVO RESULTADO DEL PROGRAMA 2
+path_resultado = directorio_automatico + '\Resultado.xlsx'
+
 # Asegurarse de que las carpetas existen
 for form in form_data.values():
     os.makedirs(form['subidos'], exist_ok=True)
     os.makedirs(form['generados'], exist_ok=True)
 
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #SECCION DE LA FUNCION QUE CARGA EL INDEX
 @app.route('/', methods=['GET','POST'])
 def index():
+    # Get form_id from query on the url
+    form_id = request.args.get('form_id', 'formulario1')
+    print("Este es el ID del formulario a ejecutarse: ", form_id)
     return render_template('index.html', 
-                           list_Archivos=listaArchivos("formulario1", "subidos"),)
+                           list_Archivos=listaArchivos(form_id, "subidos"),)
                            #file_path=uploaded_file_path)
 
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #SECCION DE LA FUNCION QUE SE ENCRAGA DE LA SUBIDA DE LOS ARCHIVOS
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -148,7 +210,6 @@ def upload_file():
     if form_id in form_data:
         file_key = form_data[form_id]['file_key']
         folder = form_data[form_id]['subidos']
-        tipo = 'subidos'
         file = request.files[file_key]
 
         #PARTE DEL FORMATO DEL NOMBRE QUE TOMARA EL ARCHIVO SUBIDO CON EL RENOMBRE
@@ -173,7 +234,7 @@ def upload_file():
                                 #SE PASA EL FORM SELECCIONADO
                                 form_id=form_id,
                                 #FUNCION PARA LA VISUALIZACION DE LOS ARCHIVOS EN LA CARPETA
-                                list_Archivos = listaArchivos(form_id, tipo),
+                                list_Archivos = listaArchivos(form_id, 'subidos'),
                                 #NOMBRES DE LOS ARCHIVOS SUBIDOS
                                 archivo1 = file.filename,
                                 #MENSAJES DONDE SE ALOJO EL ARCHIVO SUBIDO
@@ -182,8 +243,9 @@ def upload_file():
                                 div9_block = True
                                )
 
-#---------------------------------------------------------------------------
-#---------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #SECCION DE LA FUNCION QUE SE ENCRAGA DE LA SUBIDA DE LOS ARCHIVOS
 def listaArchivos(form_id, tipo):
     global form_data
@@ -201,8 +263,9 @@ def listaArchivos(form_id, tipo):
     
     return []  # Retorna una lista vacía si el form_id o tipo no son válidos
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #FUNCION QUE PERMITE ELEMINAR LOS ARCHIVOS SUBIDOS POR EL USUARIO
 @app.route('/deleteSub/<filename>', methods=['GET'])
 def delete_file_subidos(filename):
@@ -222,8 +285,9 @@ def delete_file_subidos(filename):
     else:
         return jsonify({'error': 'Archivo no encontrado'}), 404
     
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #FUNCION QUE PERMITE ELEMINAR LOS ARCHIVOS GENERADOS POR EL USUARIO
 @app.route('/deleteGen/<filename>', methods=['POST'])
 def delete_file_generados(filename):
@@ -243,14 +307,16 @@ def delete_file_generados(filename):
     else:
         return jsonify({'error': 'Archivo no encontrado'}), 404
     
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#FUNCION
-    
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#FUNCIONAMIENTO DEL PROGRAMA GENERADOR DE PLANTILLA PROGRAMA 1
+#######################################################################################
+#######################################################################################
+#######################################################################################
+
+
 #FUNCION QUE TRANSFORMA EL ARCHIVO CSV SUBIDO A ARCHIVO TXT CON LA ESTRUCTURA
 def procesar_archivo_csv(archivoGlo1):
     global archivo_txt
@@ -264,6 +330,9 @@ def procesar_archivo_csv(archivoGlo1):
         print(f"Error al procesar el archivo CSV: {e}")
     return archivo_txt
 
+#######################################################################################
+#######################################################################################
+#FUNCION ENCARGADA DE CONVERTIR EL ARCHIVO CSV PARA EL CORRECTO FUNCIONAMIENTO DEL PROGRAMA 1
 def convierte_csv_a_txt(archivoGlo1):
     global archivo_txt
     try:
@@ -341,10 +410,8 @@ def convierte_csv_a_txt(archivoGlo1):
     except Exception as e:
         raise ValueError(f"Error al escribir el archivo TXT: {e}")
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
 #FUNCION QUE SE ENCARGA DE COLOCAR EL NUMERO ECONOMICO A LOS PROFESORES
 def get_numero_economico(nombre_del_profe, codigoGen1):
     try:
@@ -360,47 +427,9 @@ def get_numero_economico(nombre_del_profe, codigoGen1):
         return numero_economico
     except Exception as e:
         raise RuntimeError(f"Error al obtener el número económico: {e}")
-    """ 
-    #Fila y Columna del profesor
-    fila_encontrada = None
-    columna_encontrada = None
-    try:
-        if nombre_del_profe is None:
-            # Lanzar error si no se proporciona el nombre del profesor
-            raise ValueError("No se ha proporcionado el nombre del profesor.")
-        
-        iterRowsOfProfesores = hoja_profesores.iter_rows(values_only=True)
-        enumerateProfesores = enumerate(iterRowsOfProfesores)
-        # print(f"Buscando el número económico del profesor: {nombre_del_profe}")
-        # print(f"Recorriendo la hoja 'Profesores'")
-        # print("iterRowsOfProfesores: ", iterRowsOfProfesores)
-        # print("enumerateProfesores: ", enumerateProfesores)
-        # Recorre la hoja 'Profesores'
-        for fila_index, fila in enumerateProfesores:
-            for columna_index, valor in enumerate(fila):
-                if valor is None:
-                    continue
-                elif valor is not None and type(valor) == str and nombre_del_profe in valor:
-                    #Se almacena la posicion del valor encontrado
-                    fila_encontrada = fila_index + 1 #Se suma uno porque se comienza en 0
-                    columna_encontrada = columna_index + 1 #Se suma uno porque se comienza en 0
-                    break #Termina al encontrar el nombre el bucle
-        print(f"La fila es: {fila_encontrada}")
-        print(f"La columna es: {columna_encontrada}")
-        # print(f"El profesor {nombre_del_profe} se encuentra en la fila {fila_encontrada} y columna {columna_encontrada}")
-        if fila_encontrada is None or columna_encontrada is None:
-            raise ValueError(f"No se ha encontrado el nombre del profesor: {nombre_del_profe}")
-
-        #Coloca el numero economico al encontrar la fila y columna
-        numero_economino_celda = hoja_profesores.cell(row=fila_encontrada, column=columna_encontrada + 1).value
-        if numero_economino_celda is None:
-            raise ValueError(f"No se ha encontrado el número económico para el profesor: {nombre_del_profe}")
-        # print(f"El número económico del profesor {nombre_del_profe} es: {numero_economino_celda}")
-        return int(numero_economino_celda) #Regresa el valor del numero economico
-    except Exception as e:
-        print(f"Error al obtener el número económico: {e}")
-        return "Error al obtener el número económico." """
     
+#######################################################################################
+#######################################################################################
 def configProfesores():
     global workbook
     workbook = openpyxl.load_workbook(plantilla1)
@@ -414,6 +443,8 @@ def configProfesores():
         else:
             break
 
+#######################################################################################
+#######################################################################################
 # Función para pasar los nombres a minusculas, sin espacios y sin acentos
 def clean_name(name):
     name = name.lower()
@@ -424,10 +455,9 @@ def clean_name(name):
     name = name.replace('ó', 'o')
     name = name.replace('ú', 'u')
     return name
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+
+#######################################################################################
+#######################################################################################
 #FUNCION QUE MANEJA EL NOMBRE DE LOS PROFESORES EN CASO DE NO TENER SEGUNDO NOMBRE
 def manejo_de_nombre(nombre):
     try:
@@ -447,10 +477,8 @@ def manejo_de_nombre(nombre):
         print(f"Error al manejar el nombre: {e}")
         return nombre  # Retorna el nombre original en caso de error
     
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
 #FUNCION PARA GENERAR EL DOCUMENTO TXT QUE CONTENDRA EL NOMBRE DE LOS ESTUDIANTES Y A QUE PT PERTENECEN
 def generar_txt_estudiantes_PT():
     print('Generando el archivo Estudiantes de PT')
@@ -473,10 +501,8 @@ def generar_txt_estudiantes_PT():
     except Exception as e:
         print(f"Error al generar el archivo Estudiantes de PT: {e}")
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
 #FUNCION PARA EL MANEJO DE LOS GRUPOS
 def manejo_grupo(proyecto : dict):
     #Agrega la informacion del proyecto actual a LA LISTA DE GRUPOS
@@ -509,10 +535,9 @@ def config_grupos_from_0(proyecto, grupo):
     grupo['Alumno(s)'].append( {'nombre' : proyecto['Alumno'], 'matrícula': proyecto['Matricula']} )
     grupo['PT'] = proyecto['PT']
     grupos.append(grupo)
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+
+#######################################################################################
+#######################################################################################
 #FUNCION PARA CREAR LA TABLA EN EL ARCHIVO XLSX
 def crear_tabla(row_number, column_number, hoja, info):
     #Estilos globales de la tabla a crear
@@ -887,10 +912,8 @@ def crear_tabla(row_number, column_number, hoja, info):
     celda.border = border_header_tabla
     celda.value = horario_del_curso
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
 #FUNCION ENCARGADA EN LA GENERACION DE COEFICIENTES
 def crear_coeficientes(row_number, column_number, hoja, data):
     print('Generando los coeficientes de los asesores y sus alumnos')
@@ -1002,10 +1025,8 @@ def crear_coeficientes(row_number, column_number, hoja, data):
 
             contador_posicion = celda.row + 1
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+#######################################################################################
+#######################################################################################
 #FUNCION MAIN PARA GRUPOS DE PT
 def main(codigoGen1):
     with open(archivosGenerados1_folder + codigoGen1,'r',encoding="utf-8") as file:
@@ -1219,7 +1240,8 @@ def main(codigoGen1):
         print(f"Error al guardar el archivo o generar el TXT: {e}")
         raise Exception(f"Error al guardar el archivo o generar el TXT: {e}")
     
-
+#######################################################################################
+#######################################################################################
 def get_genre(name):
     indice = name.index(' ')
     titulado = indice - 1
@@ -1228,15 +1250,20 @@ def get_genre(name):
     else:
         return 'M'
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #FUNCION GENERADORA DEL DOCUMENTO EXCEL Y EL TXT DEL PRIMER MODULO GRUPOS DE PT (ARCHIVO ESPECIFICO)
+#######################################################################################
+#######################################################################################
+#######################################################################################
 @app.route('/GruposPT/<filename>', methods=['GET'])
 def generar_GruposPT(filename):
     global directorio_automatico
-    fileGenerated = doGenerarGruposPT(filename)
+    form_id = request.form.get('form_id')
+    fileGenerated = doGenerarGruposPT(filename, form_id)
     if fileGenerated.success:
             return render_template('generar.html',
                                             directorio_automatico2=directorio_automatico,
@@ -1264,22 +1291,26 @@ def generar_GruposPT(filename):
                                             txt_filenames=[],
                                             div9_block=True)
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
+####################################################################################### 
+#######################################################################################
+#######################################################################################
 #FUNCION GENERADORA DEL DOCUMENTO EXCEL Y EL TXT DEL PRIMER MODULO GRUPOS DE PT (MULTI ARCHIVOS)
+#######################################################################################
+#######################################################################################
+#######################################################################################
 @app.route('/GruposPTMulti', methods=['POST'])
 def generar_GruposPTMulti():
     global directorio_automatico
+    form_id = request.form.get('form_id') or 'formulario1'
     print('request.form.items()',request.form.items())
     options = []
     for key, value in request.form.items():
-        options.append(value)
-    print('options',options)
+        if key.endswith(('csv', 'xls', 'xlsx', 'txt')):  # Ensure this is a tuple of strings
+            options.append(value)
+    print('options:', options)  # Add a colon for better readability
     filesGenerated = []
     for option in options:
-        filesGenerated.append(doGenerarGruposPT(option))
+        filesGenerated.append(doGenerarGruposPT(option, form_id))
     print('filesGenerated',filesGenerated)
     successedFiles = []
     failedFiles = []
@@ -1298,13 +1329,13 @@ def generar_GruposPTMulti():
     if successedFiles and len(successedFiles) > 0:
         message2 = f"Los archivos {', '.join([file.get('txt_filename') for file in successedFiles if file.get('txt_filename')])} se generaron con éxito en {directorio_archiGeneradosGruposDePtExcell}"
     if failedFiles and len(failedFiles) > 0:
-        message2 = message2 + f"Los archivos {', '.join([file.get('archivoGlobal1') for file in failedFiles if file.get('archivoGlobal1')])}, tuvieron el siguiente eeror: Archivo CSV no encontrado"
+        message2 = message2 + f"Los archivos {', '.join([file.get('archivoGlobal1') for file in failedFiles if file.get('archivoGlobal1')])}, tuvieron el siguiente error: Archivo CSV no encontrado"
     archivosGlobales = [fileGenerated.get("archivoGlobal1") for fileGenerated in successedFiles]
     codigosGen = [fileGenerated.get("codigoGen1") for fileGenerated in successedFiles]
     archivos = [fileGenerated.get("archivo") for fileGenerated in successedFiles]
     txt_filenames = [fileGenerated.get("txt_filename") for fileGenerated in successedFiles]
-    list_Archivos = listaArchivos("formulario1", "subidos")
-    list_Archivos_Generados = listaArchivos("formulario1", "generados")
+    list_Archivos = listaArchivos(form_id, "subidos")
+    list_Archivos_Generados = listaArchivos(form_id, "generados")
     print('message',message)
     print('message2',message2)
     print('successedFiles',successedFiles)
@@ -1330,17 +1361,20 @@ def generar_GruposPTMulti():
                             list_Archivos_Generados = list_Archivos_Generados,
                             div9_block=True)
 
-def doGenerarGruposPT(filename):
+
+#######################################################################################
+#######################################################################################
+def doGenerarGruposPT(filename, form_id):
     global directorio_automatico
     global archivoGlo1
     global archivoGlobal1
     global ArchiGenerado
 
-    form_id = 'asignacionesTXT'
-    tipo = 'subidos'
-
     archivoGlobal1 = filename
-    archivoGlo1 = directorio_automatico + "\\GruposDePTExcell\\ArchivosSubidos\\" + archivoGlobal1
+    folderSubidos = form_data[form_id]['subidos']
+    folderGenerados = form_data[form_id]['generados']
+
+    archivoGlo1 = folderSubidos + archivoGlobal1
     print(f"ArchivoGlobal1 que se usará en el main: {archivoGlobal1}")
     print(f"ArchivoGlo1 que se usará en el main: {archivoGlo1}")  # RUTA COMPLETA DEL CSV SUBIDO POR EL USUARIO
 
@@ -1365,7 +1399,10 @@ def doGenerarGruposPT(filename):
             print(f"El archivo txt tiene el nombre de: {codigoGen1}")
 
             # Llama a la función en main.py que procesará el archivo TXT
-            coeficientes = main(codigoGen1)  # Suponiendo que 'main' es la función que deseas llamar en main.py
+            if form_id == 'formulario1':
+                coeficientes = main(codigoGen1)  # Suponiendo que 'main' es la función que deseas llamar en main.py
+            elif form_id == 'formulario2':
+                coeficientes = main2(codigoGen1)  # Suponiendo que 'main' es la función que deseas llamar en main.py
             print(f"El archivo coeficientes tiene el nombre de: {coeficientes}")
 
             # Renderizar la plantilla con los datos necesarios
@@ -1386,7 +1423,9 @@ def doGenerarGruposPT(filename):
             "success": False
         }
 
-
+#######################################################################################
+#######################################################################################
+#######################################################################################
 #FUNCION QUE LISTA LOS ARCHIVOS
 @app.route('/archivo/<filename>', methods=['GET'])
 def view_file_generated(form_id, tipo):
@@ -1543,9 +1582,292 @@ def crear_coeficiente(row_number, column_number, hoja, data):
 
             contador_posicion = celda.row + 1
 
+#######################################################################################
+#######################################################################################
+#FUNCIONAMIENTO DEL PROGRAMA GENERADOR DE PLANTILLA PROGRAMA 2
+#######################################################################################
+#######################################################################################
 
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-#FUNCION MAIN 
+#Abriendo el archivo de excel
+#Este diccionario se llena de datos
+diccionario_de_posiciones_de_tablas = []
+
+# guardando el documento
+documento = pd.ExcelFile(path, engine='openpyxl')
+
+#sheet = 'TRIMESTRE X'
+sheet = 'FORMATO PROGRAMACIÓN'
+
+### diccionario de datos de las tablas
+diccionario_tablas = {
+    'NOMBRE': [],
+    'MATERIA': [],
+    'GRUPO': [],
+    'HORAS': []
+}
+
+#Guardando el documento
+documento = pd.read_excel(path, sheet_name=sheet, engine='openpyxl')
+#######################################################################################
+#######################################################################################
+#Funcion para recorrer los valores
+def recorrerValores(array, string):
+    i=0
+    while i < len(array[i]):
+        for item in array[i] == string:
+            if item == True:
+                return i
+        i += 1
+    
+
+#######################################################################################
+#######################################################################################
+### función para insertar datos al diccionario
+def insertarDatosProfesAlDiccionario(diccionario, nombre, materia, grupo, horas):
+    ### si los arreglos están vacíos, se agregar datos del primer profe a cada arreglo
+        diccionario['NOMBRE'].append(nombre)
+        diccionario['MATERIA'].append(materia)
+        diccionario['GRUPO'].append(grupo)
+        diccionario['HORAS'].append(horas)
+
+#######################################################################################
+#######################################################################################
+def extraer_datos(archivo_entrada):
+    
+    path = directorio_automatico + archivo_entrada
+    documento = pd.ExcelFile(path, engine='openpyxl')
+
+    # Recorrer cada hoja en el archivo
+    for nombre_hoja in documento.sheet_names:
+        # Cargar la hoja actual
+        df = pd.read_excel(path, sheet_name=nombre_hoja, engine='openpyxl')
+        
+        # Lista para almacenar las posiciones encontradas en la hoja actual
+        posiciones = []
+
+        # Recorrer cada celda en la hoja actual
+        for i in range(len(df)):
+            for j in range(len(df.columns)):
+                if df.iloc[i, j] == 'NOMBRE DEL CURSO':
+                    # Convertir índice de columna numérico a notación de letras
+                    columna_letra = get_column_letter(j + 1)
+                    # Almacenar la posición en formato Excel (por ejemplo, A1, B2)
+                    posiciones.append(f"{columna_letra}{i + 1}")
+
+        # Si se encontraron posiciones, agregarlas a la lista principal
+        if posiciones:
+            diccionario_de_posiciones_de_tablas.append({
+                'pagina': nombre_hoja,
+                'cabeceras': posiciones
+            })
+
+# Función para obtener el valor de una celda
+def obtener_valor_celda(celda, nombre_hoja, archivo_entrada):
+    path = directorio_automatico + archivo_entrada
+    wb = load_workbook(filename=path)
+    ws = wb[nombre_hoja]
+
+    return ws[celda].value
+
+#######################################################################################
+#######################################################################################
+def recorrer_tablas(data:dict, archivo_entrada):
+    
+    # documento_temporal = pd.read_excel(path, sheet_name= data['hoja'], engine='openpyxl')
+    nombre_hoja = data.pop('hoja', None)
+
+    #### recorrer los valores de la tabla y agregarlo a la info de arriba:
+    # Recorrer el diccionario
+    for indice, posiciones in data.items():
+        # Obtener el número de la fila inicial
+        fila_inicial = int(''.join(filter(str.isdigit, indice)))
+        
+        # Comenzar a partir de la fila inicial + 3
+        fila_actual = fila_inicial + 3
+
+        while True:
+            # Construir la referencia de celda para cada columna
+            celda_indice = f"{indice[0]}{fila_actual}"
+            celda_profesor = f"{posiciones['PROFESOR'][0]}{fila_actual}"
+            celda_grupo = f"{posiciones['GRUPO'][0]}{fila_actual}"
+            celda_horas = f"{posiciones['HORAS'][0]}{fila_actual}"
+
+            # Obtener los valores de las celdas
+            valor_indice = obtener_valor_celda(celda_indice, nombre_hoja, archivo_entrada)
+            valor_profesor = obtener_valor_celda(celda_profesor, nombre_hoja, archivo_entrada)
+            valor_grupo = obtener_valor_celda(celda_grupo, nombre_hoja, archivo_entrada)
+            valor_horas = obtener_valor_celda(celda_horas, nombre_hoja, archivo_entrada)
+
+            # Verificar si el valor de la celda índice es nulo
+            if valor_indice is None:
+                break
+            else:
+
+                    if (len(diccionario_tablas['NOMBRE'] and diccionario_tablas['MATERIA'] and diccionario_tablas['HORAS']) < 0):
+                    
+                        ### si los arreglos están vacíos, se agregar datos del primer profe a cada arreglo
+                        insertarDatosProfesAlDiccionario(diccionario_tablas, valor_profesor, valor_indice, valor_grupo, valor_horas)
+
+                    else:
+                        
+                        ### si el profe existe en el diccionario, agregarlo
+                        if(valor_profesor in diccionario_tablas['NOMBRE']):
+
+                            ### sacar su posición
+                            posicion = diccionario_tablas['NOMBRE'].index(valor_profesor)
+                            ### agregamos los nuevos valores en la posición
+                            diccionario_tablas['NOMBRE'].insert(posicion, valor_profesor)
+                            diccionario_tablas['MATERIA'].insert(posicion, valor_indice)        
+                            diccionario_tablas['GRUPO'].insert(posicion, valor_grupo)
+                            diccionario_tablas['HORAS'].insert(posicion, valor_horas)
+                        else:
+
+                            ### agregamos los nuevos valores en la posición
+                            insertarDatosProfesAlDiccionario(diccionario_tablas, valor_profesor, valor_indice, valor_grupo, valor_horas)
+
+                    # Imprimir los valores
+                    # print(f"Valor en {celda_indice}: {valor_indice}")
+                    # print(f"Valor en {celda_profesor}: {valor_profesor}")
+                    # print(f"Valor en {celda_grupo}: {valor_grupo}")
+                    # print(f"Valor en {celda_horas}: {valor_horas}")
+                    # print('---')
+
+                    print(f"{valor_indice}")
+                    print(f"{valor_profesor}")
+                    print(f"{valor_grupo}")
+                    print(f"{valor_horas}")
+                    print('---')
+
+            # Incrementar la fila actual
+            fila_actual += 1
+
+def vueltaDic(nombre, value):
+    for item in value:
+        if item['nombre'] == nombre:
+            return True
+        else:
+            pass
+df=pd.DataFrame(diccionario_tablas)
+
+df['TOTAL DE HORAS'] = df.groupby('NOMBRE', sort=False)['HORAS'].transform('sum')
+result = df.set_index(['NOMBRE','TOTAL DE HORAS','GRUPO'])
+
+with pd.ExcelWriter(path, mode='a', if_sheet_exists='replace')as writer:
+    result.to_excel(writer, sheet_name = 'RESULTADOS')
+
+    workbook = load_workbook(path)
+    worksheet = workbook['RESULTADOS']
+
+    worksheet.column_dimensions['A'].width = 36
+    worksheet.column_dimensions['B'].width = 17
+    worksheet.column_dimensions['D'].width = 45
+
+    workbook.save(path)
+    workbook.close()
+
+#######################################################################################
+#######################################################################################
+def recoleccion_indices(archivo_entrada):
+    path = directorio_automatico + archivo_entrada
+
+    for grupo in diccionario_de_posiciones_de_tablas:
+
+        nombre_de_la_hoja = grupo['pagina']
+        celdas = grupo['cabeceras']
+
+        # Encabezados a buscar
+        encabezados_a_buscar = ['PROFESOR', 'PROFESOR POSIBLE', 'GRUPO', 'HORAS']
+
+
+        documento_temporal = pd.read_excel(path, sheet_name= nombre_de_la_hoja, engine='openpyxl')
+
+        # Diccionario para almacenar los resultados
+        celdas_encabezados_por_fila = {
+            'hoja': nombre_de_la_hoja,
+        }
+
+        # Iterar sobre cada celda en la lista de celdas
+        for celda in celdas:
+            # Extraer la letra de la columna y el número de la fila
+            columna_letra = ''.join([c for c in celda if c.isalpha()])  # Ej. 'B'
+            fila_numero = int(''.join([c for c in celda if c.isdigit()]))  # Ej. 5
+
+            # Obtener la fila específica
+            fila_especifica = documento_temporal.iloc[fila_numero - 1]  # Restar 1 para índice basado en 0
+
+            # Buscar los encabezados en la fila específica y construir la referencia de celda
+            celdas_encabezados = {}
+            for encabezado in encabezados_a_buscar:
+                if encabezado in fila_especifica.values:
+                    # Obtener la posición del encabezado
+                    columna_indice = fila_especifica[fila_especifica == encabezado].index[0]
+                    columna_numero = documento_temporal.columns.get_loc(columna_indice) + 1  # Índice basado en 1
+                    columna_letra = get_column_letter(columna_numero)
+
+                    # Construir la referencia de celda en formato Excel
+                    celda_referencia = f"{columna_letra}{fila_numero}"
+
+                    # Unificar 'PROFESOR' y 'PROFESOR POSIBLE' bajo la clave 'PROFESOR'
+                    if encabezado in ['PROFESOR', 'PROFESOR POSIBLE']:
+                        celdas_encabezados['PROFESOR'] = celda_referencia
+                    else:
+                        celdas_encabezados[encabezado] = celda_referencia
+
+            # Almacenar las celdas encontradas para cada fila inicial
+            celdas_encabezados_por_fila[celda] = celdas_encabezados
+
+
+        recorrer_tablas(celdas_encabezados_por_fila, archivo_entrada)
+
+
+    # Generación del archivo resultado
+    if diccionario_tablas:
+        df = pd.DataFrame(diccionario_tablas)
+        df['TOTAL DE HORAS'] = df.groupby('NOMBRE', sort=False)['HORAS'].transform('sum')
+        result = df.set_index(['NOMBRE', 'TOTAL DE HORAS', 'GRUPO'])
+
+        # Crear un nuevo archivo Excel con una hoja llamada 'RESULTADOS'
+        with pd.ExcelWriter(path_resultado, mode='w') as writer:  # Cambiamos a modo 'w' para crear un nuevo archivo
+            result.to_excel(writer, sheet_name='RESULTADOS')
+
+        # Cargar el workbook recién creado
+        workbook = load_workbook(path_resultado)
+        # Abrir la hoja del workbook
+        worksheet = workbook['RESULTADOS']
+
+        # Declarar el tamaño de las columnas
+        worksheet.column_dimensions['A'].width = 36
+        worksheet.column_dimensions['B'].width = 17
+        worksheet.column_dimensions['D'].width = 45
+
+        workbook.save(path_resultado)
+        workbook.close()
+    else:
+        print('No se agregaron datos')
+
+#######################################################################################
+#######################################################################################
+def main2(archivo_entrada:str):
+
+    extraer_datos(archivo_entrada)
+
+    if diccionario_de_posiciones_de_tablas:
+        recoleccion_indices(archivo_entrada)
+    else:
+        print('no se ha encontrado ninguna tabla')
+#######################################################################################
+#######################################################################################
+#######################################################################################
+
+
+
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#FUNCION MAIN ENCARGADA DEL EXCELENTE FUNCIONAMIENTO
+#######################################################################################
+#######################################################################################
+#######################################################################################
 if __name__ == "__main__":
     app.run(debug=True)

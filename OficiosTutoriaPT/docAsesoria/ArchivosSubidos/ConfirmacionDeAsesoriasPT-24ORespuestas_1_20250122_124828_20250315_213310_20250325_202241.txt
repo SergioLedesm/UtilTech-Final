@@ -1,0 +1,336 @@
+Titulo: vehículos y robots interactuando con multitudes
+Asesor(es): Rudomin Goldberg Isaac Juan
+Revisor(es): 
+Alumno: Genaro Daniel Gonzalez Martinez
+Matrícula: 2193076150
+PT: 1
+
+Titulo: Simulacion Metro
+Asesor(es): Rudomin Goldberg Isaac Juan
+Revisor(es): 
+Alumno: Sanchez Aparicio Lucero Reyna 
+Matrícula: 2193034867
+PT: 1
+
+Titulo: AvesIA
+Asesor(es): Rudomin Goldberg Isaac Juan
+Revisor(es): 
+Alumno: Jimenez Marcelino 
+Matrícula: 2173033748-
+PT: 3
+
+Titulo: Evacuacion
+Asesor(es): Rudomin Goldberg Isaac Juan
+Revisor(es): 
+Alumno: Guzman Roque Ivan
+Matrícula: 2203065947
+PT: 3
+
+Titulo: Emergencias
+Asesor(es): Rudomin Goldberg Isaac Juan
+Revisor(es): 
+Alumno: MARTINEZ MARTINEZ LUIS GUSTAVO
+Matrícula: 2173033739
+PT: 2
+
+Titulo: Aplicación Web sobre la brecha digital y el acceso a las tecnologías
+Asesor(es): Jaimez González Carlos Roberto, Herrera Zapata José Adolfo
+Revisor(es): 
+Alumno: RAMIREZ DOMINGUEZ LUIS EDUARDO
+Matrícula: 2173033766
+PT: 1
+
+Titulo: Plataforma web para la medición del desarrollo humano con perspectiva de género
+Asesor(es): Jaimez González Carlos Roberto, Herrera Zapata José Adolfo
+Revisor(es): 
+Alumno: AVILA GUAPO DANA CHARLOTTE
+Matrícula: 2193076230
+PT: 2
+
+Titulo: Herramienta digital para apoyar la educación financiera
+Asesor(es): Jaimez González Carlos Roberto, Herrera Zapata José Adolfo
+Revisor(es): 
+Alumno: HERRERA BERNAL MAURICIO
+Matrícula: 2193034689
+PT: 2
+
+Titulo: Waste Tracker: Aplicación web para la recolección de residuos orgánicos
+Asesor(es): Matadamas Hernández Jorge, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: García Romero Evlin
+Matrícula: 2203024393
+PT: 3
+
+Titulo: Elementum Dominando la tabla periódica
+Asesor(es): Matadamas Hernández Jorge, Jaimez González Carlos Roberto
+Revisor(es): García Mendoza (Betzabet), Cruz León (Jorge Stefan)
+Alumno: Loa Salinas Daniela
+Matrícula: 2203065867
+PT: 3
+
+Titulo: Asistente virtual basado en IA generativa para apoyar al estudiante de la UAM-C en trámites académicos de movilidad y optativas
+Asesor(es): Moreno Olivos  Tiburcio
+Revisor(es): 
+Alumno: PEÑA ANGARITA JUAN SEBASTIAN
+Matrícula: 2213025553-
+PT: 2
+
+Titulo: Sistema RAG: Herramienta de Apoyo para la UEA de Programación Estructurada
+Asesor(es): Moreno Olivos Tiburcio
+Revisor(es): 
+Alumno: ZAMARRIPA ROMERO JOSE ALBERTO
+Matrícula: 2193034965-
+PT: 2
+
+Titulo: Plataforma Educativa Interactiva para el Desarrollo Cognitivo Infantil
+Asesor(es): Moreno Olivos Tiburcio, Rivero Moreno Carlos Joel
+Revisor(es): 
+Alumno: PEREZ MACIEL ABIGAIL
+Matrícula: 2213025526-
+PT: 2
+
+Titulo: Desarrollo de un sistema Web de información de áreas y carreras de universidades públicas
+Asesor(es): Rivero Moreno Carlos Joel , Moreno Olivos Tiburcio
+Revisor(es): 
+Alumno: FISCAL BARRERA OSCAR
+Matrícula: 2203024419-
+PT: 3
+
+Titulo: Aplicación móvil para apoyar la práctica del vocabulario del idioma inglés
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto, Roman Sánchez Diana Ibet
+Revisor(es): 
+Alumno: DELIA DAFNE CENTENO MENDEZ
+Matrícula: 2213063713
+PT: 2
+
+Titulo: Plataforma web de tutoriales de programación con compilador en línea 
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto, Roman Sánchez Diana Ibet
+Revisor(es): 
+Alumno: ELIA DANAE CENTENO MENDEZ
+Matrícula: 2213063722
+PT: 2
+
+Titulo: Herramienta de apoyo para crear diagramas de redes de Internet “Network Diagrammer”
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto, Roman Sánchez Diana Ibet
+Revisor(es): 
+Alumno: GRECIA QUIROZ SANTANDER
+Matrícula: 2213025535
+PT: 2
+
+Titulo: Aplicación Web para la práctica de sistemas de numeración
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto, Roman Sánchez Diana Ibet
+Revisor(es): 
+Alumno: ANDREA MUNOZ ANDRADE
+Matrícula: 2193034741
+PT: 2
+
+Titulo: SISTEMA WEB DE MESA DE SERVICIO: CASO DE  ESTUDIO DE LA UAM CUAJIMALPA
+Asesor(es): Jaimez González Carlos Roberto, García Mendoza Betzabet , Román Sánchez Diana Ibet
+Revisor(es): López Castillo (Pablo Héctor), Bravo Infante (Adrián)
+Alumno: IVÁN ALBERTO CORTÉS NAVA
+Matrícula: 2193076329
+PT: 3
+
+Titulo: Aplicación web para niños con hipoacusia
+Asesor(es): García Mendoza Betzabet , Jaimez González  Carlos Roberto , Román Sánchez Diana Ibet
+Revisor(es): 
+Alumno: FERNANDO REYES PEREZ 
+Matrícula: 2193076178
+PT: 3
+
+Titulo: Directorio digital para supermercados
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: MEJIA MOSQUEDA RAUL OMAR
+Matrícula: 2173033588
+PT: 1
+
+Titulo: Guía de uso en Web de sistemas de riego a partir de estudio comparativo
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: PEREZ CRUCES DAVID ALEJANDRO
+Matrícula: 2173083471
+PT: 1
+
+Titulo: Directorio Electronico de UAM - Cuajimalpa
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: ROCHA CASTELLANOS ANDREA
+Matrícula: 2203065750
+PT: 1
+
+Titulo: Aplicación móvil de primeros auxilios.
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: SALAZAR SANTOVEÑA SEBASTIAN
+Matrícula: 2213025286
+PT: 1
+
+Titulo: Juego multijugador para estudiar conceptos y fórmulas de Física de nivel secundaria
+Asesor(es): Rivero Moreno Carlos Joel, Matadamas Hernández Jorge
+Revisor(es): 
+Alumno: CAMACHO BALTAZAR IRVING FERNANDO
+Matrícula: 2193076196
+PT: 1
+
+Titulo: Comparación de algoritmos de detección de ataques tipo DoS mediante simulación de redes
+Asesor(es): Rivero Moreno Carlos Joel
+Revisor(es): 
+Alumno: SANCHEZ PEREZ MILDRED AIKO
+Matrícula: 2213025348
+PT: 2
+
+Titulo: Calculadora de lógica matemática como herramienta de apoyo para su aprendizaje.
+Asesor(es): Rivero Moreno Carlos Joel
+Revisor(es): 
+Alumno: SOLIS ROBLERO EDUARDO JOSUE
+Matrícula: 2183076531
+PT: 2
+
+Titulo: Plataforma Educativa Interactiva para el Desarrollo Cognitivo Infantil
+Asesor(es): Rivero Moreno Carlos Joel, Moreno Olivos Tiburcio
+Revisor(es): Hernández Diaz (Erick Armando)
+Alumno: PEREZ MACIEL ABIGAIL
+Matrícula: 2213025526
+PT: 2
+
+Titulo: Análisis de clasificación no supervisada de composiciones musicales basado en la elicitación de emociones
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: ARELLANO MORALES DANIEL
+Matrícula: 2203065732
+PT: 2
+
+Titulo: Sistema para automatización de estacionamientos
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: FONSECA NEOS SALVADOR MICHEL
+Matrícula: 2203024160
+PT: 2
+
+Titulo: Sistema de evaluación de conocimiento mediante la teoría y técnica de redes semánticas naturales.
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): 
+Alumno: GONZALEZ DE LEON JORGE LUIS
+Matrícula: 2203065670
+PT: 2
+
+Titulo: Análisis del delito en la Ciudad de México empleando un modelo de datos de red
+Asesor(es): Rivero Moreno Carlos Joel, Matadamas Hernández Jorge
+Revisor(es): Vargas Téllez (César Octavio)
+Alumno: LOZANO ANDONEY ERNESTO
+Matrícula: 2203065698
+PT: 2
+
+Titulo: Sistema electrónico con Arduino y Bluetooth para controlar las luces de un chaleco para señalización de usuarios de bicicleta
+Asesor(es): Rivero Moreno Carlos Joel
+Revisor(es): 
+Alumno: GARCIA TREJO ALEJANDRO
+Matrícula: 2203024375
+PT: 3
+
+Titulo: Videojuego 2D en Unity para el aprendizaje de vocabulario en inglés.
+Asesor(es): Rivero Moreno Carlos Joel
+Revisor(es): 
+Alumno: REYES HERNANDEZ OSCAR OSWALDO
+Matrícula: 2203024366
+PT: 3
+
+Titulo: Desarrollo de un sistema Web de información de áreas y carreras de universidades públicas de la Ciudad de México
+Asesor(es): Rivero Moreno Carlos Joel, Moreno Olivos Tiburcio
+Revisor(es): 
+Alumno: FISCAL BARRERA OSCAR
+Matrícula: 2203024419
+PT: 3
+
+Titulo: Sistema de alertas de detección de armas
+Asesor(es): Rivero Moreno Carlos Joel, Núñez Reyes Alba Rocío
+Revisor(es): Herrera Zapata (José Adolfo)
+Alumno: ROJAS TAMARGO IKER EDUARDO
+Matrícula: 2203024320
+PT: 3
+
+Titulo: Herramienta Web para el autorregistro psicológico para terapia cognitivo-conductual
+Asesor(es): Rivero Moreno Carlos Joel, Bustillo Hernández Carmen Lucía
+Revisor(es): Jaimez González (Carlos Roberto), Zúñiga Álvarez (Mónica)
+Alumno: MELENDEZ CONDE ANDREA YANET
+Matrícula: 2193076285
+PT: 3
+
+Titulo: Herramienta digital con ejercicios para disminuir el riesgo de demencia
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: Rodríguez Guevara Rubén Dalí
+Matrícula: 2203065796
+PT: 1
+
+Titulo: Herramienta digital para practicar la lengua de señas mexicana
+Asesor(es): García Mendoza  Betzabet, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: Bazán López Cinthia Elizabeth
+Matrícula: 2203065821
+PT: 1
+
+Titulo: Plataforma de juegos interactivos para la enseñanza de programación
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: Méndez Tadeo Francisco Balois
+Matrícula: 2193076258
+PT: 1
+
+Titulo: Plataforma web de juegos de Química
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: Gasca Castillo Erika
+Matrícula: 2203024311
+PT: 3
+
+Titulo: Aplicación web para la práctica de la lengua mixteca
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: Morales Sánchez Yesica
+Matrícula: 2163030931
+PT: 3
+
+Titulo: Herramienta web para la práctica de Geografía
+Asesor(es): García Mendoza Betzabet, Jaimez González Carlos Roberto
+Revisor(es): 
+Alumno: Orozco Caballero Luis Alberto
+Matrícula: 2183087785
+PT: 3
+
+Titulo: Aplicación web con ejercicios para apoyar la enseñanza de POO
+Asesor(es): Jaimez González  Carlos Roberto
+Revisor(es): 
+Alumno: Chávez Ruíz Manuel
+Matrícula: 2203024259
+PT: 3
+
+Titulo: Sistema Web para la enseñanza de historia culturas prehíspanicas
+Asesor(es): Sánchez Sánchez Christian
+Revisor(es): Moreno Olivos (Tiburcio)
+Alumno: MANJARREZ SAMANO ALEJANDRO
+Matrícula: 2183033787
+PT: 2
+
+Titulo: Sistema de Detección de Estrés Con Minería de Textos
+Asesor(es): Sánchez Sánchez Christian
+Revisor(es): Luna Ramírez (Wulfrano Arturo)
+Alumno: RODRIGUEZ MARTINEZ JOSE ANGEL
+Matrícula: 2193076132
+PT: 2
+
+Titulo: Visión por computadora: Rastreo de  objetos dinámicos
+Asesor(es): Sánchez Sánchez Christian
+Revisor(es): Mateos Papis (Alfredo Piero), Rivero Moreno (Carlos Joel)
+Alumno:  RAMIREZ PEREZ ISMAEL
+Matrícula: 2203065910
+PT: 3
+
+Titulo: Pendiente
+Asesor(es): Luna Ramírez Wulfrano Arturo, Christian Lizbeth Noguez Moreno
+Revisor(es): 
+Alumno: Miguel Angel Navarro Moreno
+Matrícula: 2213063606
+PT: 1
+
